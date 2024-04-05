@@ -1,0 +1,207 @@
+
+/* General styles */
+table
+{
+ width: 100%;
+ margin-bottom: 20px;
+ border-collapse: collapse;
+}
+
+th, td 
+{
+ border: 1px solid #ddd;
+ padding: 8px;
+ text-align: left;
+}
+
+th 
+{
+ background-color: #f2f2f2;
+}
+
+label 
+{
+ display: block;
+ margin-bottom: 10px;
+}
+
+input[type="number"] 
+{
+
+ width: 100%;
+ padding: 8px;
+ border: 2px solid #ddd;
+ border-radius: 5px;
+ box-sizing: border-box;
+}
+
+.result-container 
+{
+ margin-top: 20px;
+ padding: 10px;
+ background-color: #6a0dad;
+ color: #fff;
+ border-radius: 5px;
+
+}
+/* Execution order styles */
+.execution-order {
+ margin-top: 10px;
+ padding-left: 20px;
+}
+
+.execution-order div {
+ margin-bottom: 5px;
+}
+
+/* Average times styles */
+.average-times {
+ margin-top: 20px;
+ font-weight: bold;
+}
+
+
+/* gantt chartt */
+
+.gantt-chart 
+{
+ margin-top: 20px;
+ overflow-x: auto;
+}
+
+.gantt-chart table 
+{
+ border-collapse: collapse;
+ width: 100%;
+}
+
+.gantt-chart th,.gantt-chart td 
+{
+ border: 1px solid #ddd;
+ padding: 8px;
+ text-align: center;
+}
+
+.gantt-chart th 
+{
+ background-color: black;
+ color:#f7f9fc;
+}
+
+.gantt-chart td.process 
+{
+ background-color: #6a0dad;
+ color: #fff;
+}
+/*EXTRASS*/
+body 
+{
+ font-family: Arial, sans-serif;
+ background-color: #f8f9fa;
+}
+
+.container 
+{
+ max-width: 600px;
+ margin: 20px auto;
+ padding: 20px;
+ background-color: #ffffff;
+ border-radius: 10px;
+ box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 
+{
+ text-align: center;
+ margin-bottom: 30px;
+ color: purple;
+}
+
+/* Input section styles */
+.input-section 
+{
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 20px;
+}
+
+.input-group 
+{
+         margin-bottom: 10px;
+}
+
+.input-group label 
+{
+         display: block;
+         margin-bottom: 5px;
+         color: #333;
+}
+
+.input-section > * 
+{
+ margin-right: 10px; /* Add a margin between input elements */
+}
+
+.input-section label 
+{
+ margin-right: 5px; /* Adjust margin between label and input */
+}
+
+.input-field
+{
+     width: calc(100% - 20px);
+     padding: 8px;
+     /* border: 1px solid #ced4da; */
+     border: 3px solid greenyellow;
+     border-radius: 5px;
+     outline: none;
+     transition: border-color 0.3s;
+}
+
+.input-field:focus 
+{
+     border-color: purple;
+}
+
+.btn 
+{
+     padding: 10px 20px;
+     border: none;
+     border-radius: 5px;
+     background-color: purple;
+     color: #ffffff;
+     cursor: pointer;
+     transition: background-color 0.3s;
+}
+
+.btn:hover 
+{
+     background-color: #0056b3;
+}
+
+/* Algorithm selection styles */
+.algorithm-select 
+{
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 20px;
+}
+
+/* Result section styles */
+.result 
+{
+ padding: 20px;
+ border-radius: 10px;
+ background-color: #f7f9fc;
+}
+
+.step 
+{
+     margin-bottom: 10px;
+     font-weight: bold;
+     color: purple;
+}
+
+
