@@ -1,70 +1,67 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Process Scheduler</title>
-  <style>
-    table {
-      border-collapse: collapse;
-      width: 100%;
-	padding : 10px
-	color: red
-    }
-    th, td {
-      border: 1px solid black;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Scheduling Simulator</title>
+    <link rel="stylesheet" href="style.css">
+  
+    <!-- <link rel="stylesheet" href="style.css"> -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
+<!-- BODY -->
 <body>
-  <h1 style="color : purple">Process Scheduler</h1>
-  
-  <!-- FCFS Scheduling -->
-  <h2>First-Come-First-Serve (FCFS)</h2>
-	<!--Buttons for input-->
-<div>
-    <label for="process-id">Process ID:</label>
-    <input type="number" id="process-id">
-    <label for="burst-time">Burst Time:</label>
-    <input type="number" id="burst-time">
-        <div>
-        <br>
-        &nbsp; <!-- For Space Between Buttons */-->
-    <button style="text-align: center;onclick="addFcfsProcess()">Add Process</button>
-
-        &nbsp;
-    <button onclick="computeFcfs()">Compute FCFS</button>
-        <br>
-
+    
+    <!-- HEADER -->
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="about.html" style="text-decoration: none;">
+                <button style="padding: 8px 16px; background-color: purple; color: #fff; border: none; border-radius: 5px; cursor: pointer;">
+                    About
+                </button>
+            </a>
+            <!-- scheduler -->
+    <div class="container">
+        <h1>Process Scheduling Simulator</h1>
+        <div class="input-section">
+            <label for="process-count">Number of Processes:</label>
+            <input type="number" id="process-count" class="input-field">
+            <button class="btn" onclick="addProcessFields()">Add Processes</button>
         </div>
-</div>
+        <br>
+        <div id="process-fields"></div>
+        <br>
+        <div class="algorithm-select">
+            <label for="algorithm">Select Algorithm:</label>
 
-<br>
+            <select id="algorithm" class="input-field" onchange="toggleTQ()">
+                <option value="fcfs">First Come First Serve (FCFS)</option>
+                <option value="sjf">Shortest Job First (SJF)</option>
+                <option value="rr">Round Robin (RR)</option>
+                <option value="srtf">Shortest Remaining Time First (SRTF)</option>
+                <option value="priority">Priority Scheduling</option>           
+            </select>
 
-  <table id="fcfs-table">
-    <tr>
-      <th>Process</th>
-      <th>Arrival Time</th>
-      <th>Burst Time</th>
-    </tr>
-    <!-- FCFS process rows will be dynamically added here -->
-  </table>
+            <label for="time-quantum">Time Quantum (for RR):</label>
+            <input type="number" id="time-quantum" class="input-field" disabled>
+        </div>
+<!-- RUN ALGOOOSS -->
+        <button class="btn" onclick="runAlgorithm()">Run Algorithm</button>
+        <div id="result" class="result"></div>
+        <br>
+<!-- GANTT CHART -->
+        <div class="show-gantt">
+            <label for="show-gantt-checkbox">Show Gantt Chart:</label>
+            <input type="checkbox" id="show-gantt-checkbox" onchange="toggleGantt()">
+        </div>
+        <div id="gantt-chart" class="gantt-chart"></div>
+        
+    </div>
+
+
+    <script src="script.js"></script>
   
-  <!-- RR Scheduling -->
-  <h2>Round Robin (RR)</h2>
-  <table id="rr-table">
-    <tr>
-      <th>Process</th>
-      <th>Arrival Time</th>
-      <th>Burst Time</th>
-      <th>Time Quantum</th>
-    </tr>
-    <!-- RR process rows will be dynamically added here -->
-  </table>
-<script src="script.js"></script>
+    <!-- </script> -->
 </body>
 </html>
