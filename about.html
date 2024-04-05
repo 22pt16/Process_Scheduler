@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CPU Process Scheduler Documentation</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins&display=swap">
+    <style>
+        body 
+        {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #7ed6df; /* Peacock blue */
+            color: #333; /* Text color */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header 
+        {
+            background-color: #079992; /* Peacock green */
+            color: rgb(greenyellow);
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 0;
+            font-size: 33px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .content 
+        {
+            width: 80%;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section 
+        {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #ffffff;
+            border: 1px solid #079992; /* Peacock green */
+            border-radius: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .intro
+        {
+            flex: 1;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #f9f9f9; /* Light gray background */
+            border: 1px solid #ccc; /* Light gray border */
+            border-radius: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .intro h2
+        {
+            background-color: rgb(7, 157, 82);
+        }
+
+        h2 
+        {
+            background-color: #079992; /* Peacock green */
+            color: white;
+            padding: 15px;
+            margin: 0;
+            font-size: 20px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        p 
+        {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        ul 
+        {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+            margin: 0;
+        }
+
+        li 
+        {
+            margin-bottom: 5px;
+            padding-left: 15px; /* Indent list items */
+            position: relative; /* Position for the before pseudo-element */
+        }
+
+        li::before 
+        {
+            content: "\2022"; /* Bullet character */
+            color: #079992; /* Peacock green */
+            font-weight: bold; /* Bold bullet */
+            position: absolute;
+            left: 0;
+        }
+
+        table 
+        {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td 
+        {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #079992; /* Peacock green */
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        th 
+        {
+            background-color: #079992; /* Peacock green */
+            color: white;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        tr:nth-child(even) 
+        {
+            background-color: #f2f2f2;
+        }
+
+        footer 
+        {
+            background-color: #079992; /* Peacock green */
+            color: white;
+            padding: 10px 0;
+            width: 100%;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <b> Documentation</b><br>
+        <img src="intro.jpg" alt="CPU Scheduler Logo">
+        <br></div>
+
+    <div class="content">
+        <a href="new.html" style="text-decoration: none;">
+            <button style="font-size:20px ; padding: 8px 16px;  background-color: rgb(7, 157, 82); color: #fff; border: none; border-radius: 5px; cursor: pointer;">
+               ->  Go to Simulator <-
+            </button>
+        </a>
+        <div class="intro">
+            <h2>Welcome to our CPU Process Scheduler</h2>
+            <p><b>Hello! and Welcome to our CPU Process Scheduler </b><br> This scheduler has been implemented using HTML, CSS, and JavaScript. <br>Below are the functionalities implemented:</p>
+            <ul>
+                <li>First-Come, First-Served (FCFS)</li>
+                <li>Shortest Job First (SJF)</li>
+                <li>Shortest Remaining Time First (SRTF)</li>
+                <li>RoundRobin(RR)</li>
+                <li>Priority</li>
+            </ul>
+            <!-- <p>We have also utilized Google Fonts for styling.</p> -->
+        </div>
+
+        <div class="section">
+            <h2>First-Come, First-Served (FCFS)</h2>
+            <p><b>First-Come, First-Served (FCFS)</b> is a scheduling algorithm that executes processes in the order they arrive.</p>
+            <ul>
+                <li>Advantages: Simple, easy to implement, and no starvation.</li>
+                <li>Disadvantages: Poor performance for short processes as they have to wait for long processes to complete.</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Shortest Job First (SJF)</h2>
+            <p><b>Shortest Job First (SJF)</b> is a scheduling algorithm that executes processes with the shortest burst time first.</p>
+            <ul>
+                <li>Advantages: Provides the minimum average waiting time for a given set of processes.</li>
+                <li>Disadvantages: Can cause starvation for processes with longer burst times.</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Shortest Remaining Time First (SRTF)</h2>
+            <p><b>Shortest Remaining Time First (SRTF)</b> is a preemptive version of SJF that executes processes with the shortest remaining time first.</p>
+            <ul>
+                <li>Advantages: Provides the minimum average waiting time for a given set of processes.</li>
+                <li>Disadvantages: Can cause overhead due to frequent context switching.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+                    
+            <h2>Round Robin (RR)</h2>
+            <p><b>Round Robin (RR)</b> is a scheduling algorithm where each process is assigned a fixed time slice in a cyclic order.</p>
+            <ul>
+                <li>Advantages: Fairness among processes, prevents starvation.</li>
+                <li>Disadvantages: High waiting time for processes with long CPU burst times, high overhead due to context switching.</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Priority Scheduling</h2>
+            <p><b>Priority Scheduling</b> is a scheduling algorithm where each process is assigned a priority. The process with the highest priority is executed first.</p>
+            <ul>
+                <li>Advantages: Ensures that high-priority tasks are executed quickly, suitable for real-time systems.</li>
+                <li>Disadvantages: Starvation of low-priority processes, may lead to priority inversion.</li>
+            </ul>        
+           
+        </div>     <br>
+    </div>
+    <br><br><br>
+    <footer>Done with &hearts; by AMCS-TCS | &copy; 2024 All rights reserved.</footer>
+</body>
+</html>
