@@ -24,6 +24,21 @@
           }
       }
       
+      function toggleTQ() 
+      {
+          const algorithm = document.getElementById('algorithm').value;
+          const TQInput = document.getElementById('time-quantum');
+      
+          if (algorithm === 'rr') 
+          {
+              TQInput.disabled = false;
+          }
+          else 
+          {
+              TQInput.disabled = true;
+          }
+      }
+
       function runAlgorithm() 
       {
           const algorithm = document.getElementById('algorithm').value;
@@ -70,13 +85,20 @@
       {
           const arrivalTimes = document.querySelectorAll('.arrival-time');
           const burstTimes = document.querySelectorAll('.burst-time');
+          let contextSwitch=0;
+          let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+          if( c !== 0)
+            {
+                contextSwitch=c;
+            }
           // INITIALISE VARIABLESS
           let totaltime = 0;
           let waitng = 0;
           let tatime = 0;
           let executionorder = [];
-      // Create an array to hold objects representing processes
+         // Create an array to hold objects representing processes
           const processes = [];
+
           for (let i = 0; i < arrivalTimes.length; i++) 
           {
               processes.push({
@@ -91,7 +113,7 @@
           // Execute processes in FCFS order
           for (const process of processes) 
           {
-              const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime;
+              const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime +  contextSwitch;
               const waiting = Math.max(0, totaltime - process.arrivalTime);
               waitng += waiting;
               tatime += completionTime - process.arrivalTime;
@@ -114,21 +136,27 @@
       {
           const arrivalTimes = document.querySelectorAll('.arrival-time');
           const burstTimes = document.querySelectorAll('.burst-time');
+          let contextSwitch=0;
+          let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+          if( c !== 0)
+            {
+                contextSwitch=c;
+            }
           let totaltime = 0;
           let waitng = 0;
           let tatime = 0;
           let executionorder = [];
       
-          // Convert NodeList to array and sort processes by burst time
-          const processes = Array.from(burstTimes).map((burstTime, index) => ({
+          // Convert  and sort processes by burst time
+          const processes = Array.from(burstTimes).map((b, index) => ({
               process: index + 1,
               arrivalTime: parseInt(arrivalTimes[index].value),
-              burstTime: parseInt(burstTime.value)
+              burstTime: parseInt(b.value)
           })).sort((a, b) => a.burstTime - b.burstTime || a.arrivalTime - b.arrivalTime);
       
           for (const process of processes) 
           {
-              const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime;
+              const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime+contextSwitch;
               const waiting = Math.max(0, totaltime - process.arrivalTime);
               waitng += waiting;
               tatime += completionTime - process.arrivalTime;
@@ -147,16 +175,22 @@
       {
           const arrivalTimes = document.querySelectorAll('.arrival-time');
           const burstTimes = document.querySelectorAll('.burst-time');
+          let contextSwitch=0;
+          let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+          if( c !== 0)
+            {
+                contextSwitch=c;
+            }
           let totaltime = 0;
           let waitng = 0;
           let tatime = 0;
           let executionorder = [];
       
-          const processes = Array.from(burstTimes).map((burstTime, index) => ({
+          const processes = Array.from(burstTimes).map((b, index) => ({
               process: index + 1,
               arrivalTime: parseInt(arrivalTimes[index].value),
-              burstTime: parseInt(burstTime.value),
-              remainingBurstTime: parseInt(burstTime.value)
+              burstTime: parseInt(b.value),
+              remainingBurstTime: parseInt(b.value)
           }));
       
           while (processes.some(process => process.remainingBurstTime > 0)) 
@@ -165,7 +199,7 @@
               {
                   if (process.remainingBurstTime === 0) continue;
                   const quantum = Math.min(TQ, process.remainingBurstTime);
-                  const completionTime = Math.min(process.arrivalTime + totaltime + quantum, totaltime + process.remainingBurstTime);
+                  const completionTime = Math.min(process.arrivalTime + totaltime + quantum, totaltime + process.remainingBurstTime)+contextSwitch;
                   const waiting = Math.max(0, totaltime - process.arrivalTime);
                   waitng += waiting;
                   tatime += completionTime - process.arrivalTime;
@@ -187,6 +221,12 @@
       {
                   const arrivalTimes = document.querySelectorAll('.arrival-time');
                   const burstTimes = document.querySelectorAll('.burst-time');
+                  let contextSwitch=0;
+                  let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+                  if( c !== 0)
+                    {
+                        contextSwitch=c;
+                    }
                   let totaltime = 0;
                   let waitng = 0;
                   let tatime = 0;
@@ -220,7 +260,7 @@
                       }
       
                       const process = processes[shortestProcessIndex];
-                      const completionTime = totaltime + 1;
+                      const completionTime = totaltime + contextSwitch+ 1;
                       const waiting = totaltime - process.arrivalTime;
                       waitng += waiting;
                       tatime += completionTime - process.arrivalTime;
@@ -248,6 +288,12 @@
               const arrivalTimes = document.querySelectorAll('.arrival-time');
               const burstTimes = document.querySelectorAll('.burst-time');
               const priorities = document.querySelectorAll('.priority');
+              let contextSwitch=0;
+              let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+              if( c !== 0)
+                {
+                    contextSwitch=c;
+                }
               let totaltime = 0;
               let waitng = 0;
               let tatime = 0;
@@ -263,7 +309,7 @@
       
               for (const process of processes) 
               {
-                  const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime;
+                  const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime+contextSwitch;
                   const waiting = Math.max(0, totaltime - process.arrivalTime);
                   waitng += waiting;
                   tatime += completionTime - process.arrivalTime;
@@ -294,95 +340,143 @@
       }
       
       //*************** FCFS - GANTT ******************
+      
       function GanttFCFS(executionorder, arrivalTimes, burstTimes) 
       {
-          const ganttChartDiv = document.getElementById('gantt-chart');
-          let totaltime = 0;
-          let ganttChartHTML = `
-          <table>
-              <tr>
-                  <th>Process</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-              </tr>
-          `;
-          
-          for (let i = 0; i < executionorder.length; i++) 
+        const ganttChartDiv = document.getElementById('gantt-chart');
+        let totaltime = 0;
+        let contextSwitch=0;
+        let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+        if( c !== 0)
           {
-              const processNumber = executionorder[i].process;
-              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
-              const burstTime = parseInt(burstTimes[processNumber - 1].value);
-              const startTime = Math.max(totaltime, arrivalTime);
-              const endTime = startTime + burstTime;
-              totaltime = endTime;
-      
-              ganttChartHTML += `
-              <tr>
-                  <td>Process ${processNumber}</td>
-                  <td>${startTime}</td>
-                  <td>${endTime}</td>
-              </tr>
-              `;
+              contextSwitch=c;
           }
-      
-          ganttChartHTML += `</table>`;
-          ganttChartDiv.innerHTML = ganttChartHTML;
-      }
+        let ganttChartHTML = `
+        <table>
+            <tr>
+               
+        `;
+    
+        for (let i = 0; i < executionorder.length; i++) 
+        {
+            const processNumber = executionorder[i].process;
+            const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+            const burstTime = parseInt(burstTimes[processNumber - 1].value);
+            const startTime = Math.max(totaltime, arrivalTime);
+            const endTime = startTime + burstTime;
+            totaltime = endTime;
+    
+            ganttChartHTML += `
+            <th colspan=2>Process ${processNumber}</th>
+            <th colspan=2 class="cpu">CPU Switch</th>
+            `;
+        }
+    
+        ganttChartHTML += `</tr><tr>`;
+    
+        totaltime = 0;
+        for (let i = 0; i < executionorder.length; i++) 
+        {
+            const processNumber = executionorder[i].process;
+            const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+            const burstTime = parseInt(burstTimes[processNumber - 1].value);
+            const startTime = Math.max(totaltime, arrivalTime);
+            const endTime = startTime + burstTime;
+            totaltime = endTime;
+    
+            // Duration for the process
+        const processDuration = burstTime;
+
+        ganttChartHTML += `
+            <td>${startTime}</td>
+            <td>${endTime}</td>
+            <td colspan=2>${contextSwitch}</td>
+            `;
+        }
+    
+        ganttChartHTML += `</tr></table>`;
+        ganttChartDiv.innerHTML = ganttChartHTML;
+    }
+    
       
       //*************** SJF - GANTT******************
+      
       function GanttSJF(executionorder, arrivalTimes, burstTimes) 
+{
+    const ganttChartDiv = document.getElementById('gantt-chart');
+    let totaltime = 0;
+    let contextSwitch=0;
+    let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+    if( c !== 0)
       {
-          const ganttChartDiv = document.getElementById('gantt-chart');
-          let totaltime = 0;
-          let ganttChartHTML = `
-          <table>
-              <tr>
-                  <th>Process</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-              </tr>
-          `;
-      
-          // Sort processes by burst time
-          const sortedProcesses = executionorder.slice().sort((a, b) => {
-              return parseInt(burstTimes[a.process - 1].value) - parseInt(burstTimes[b.process - 1].value);
-          });
-      
-          for (let i = 0; i < sortedProcesses.length; i++) {
-              const processNumber = sortedProcesses[i].process;
-              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
-              const burstTime = parseInt(burstTimes[processNumber - 1].value);
-              const startTime = Math.max(totaltime, arrivalTime);
-              const endTime = startTime + burstTime;
-              totaltime = endTime;
-      
-              ganttChartHTML += `
-              <tr>
-                  <td>Process ${processNumber}</td>
-                  <td>${startTime}</td>
-                  <td>${endTime}</td>
-              </tr>
-              `;
-          }
-      
-          ganttChartHTML += `</table>`;
-          ganttChartDiv.innerHTML = ganttChartHTML;
+          contextSwitch=c;
       }
+    let ganttChartHTML = `
+    <table>
+        <tr>
+    `;
+
+    // Sort processes by burst time
+    const sortedProcesses = executionorder.slice().sort((a, b) => {
+        return parseInt(burstTimes[a.process - 1].value) - parseInt(burstTimes[b.process - 1].value);
+    });
+
+    for (let i = 0; i < sortedProcesses.length; i++) 
+    {
+        const processNumber = sortedProcesses[i].process;
+        const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+        const burstTime = parseInt(burstTimes[processNumber - 1].value);
+        const startTime = Math.max(totaltime, arrivalTime);
+        const endTime = startTime + burstTime;
+        totaltime = endTime;
+
+        ganttChartHTML += `
+            <th colspan=2>Process ${processNumber}</th>
+            <th colspan=2 class="cpu">CPU Switch</th>
+        `;
+    }
+
+    ganttChartHTML += `</tr><tr>`;
+
+    totaltime = 0;
+    for (let i = 0; i < sortedProcesses.length; i++) 
+    {
+        const processNumber = sortedProcesses[i].process;
+        const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+        const burstTime = parseInt(burstTimes[processNumber - 1].value);
+        const startTime = Math.max(totaltime, arrivalTime);
+        const endTime = startTime + burstTime;
+        totaltime = endTime;
+
+        ganttChartHTML += `
+            <td>${startTime}</td>
+            <td>${endTime}</td>
+            <td colspan=2>${contextSwitch}</td>
+        `;
+    }
+
+    ganttChartHTML += `</tr></table>`;
+    ganttChartDiv.innerHTML = ganttChartHTML;
+}
+
+
       //*************** SRTF - GANTT******************
       function GanttSRTF(executionorder, arrivalTimes, burstTimes) 
       {
           const ganttChartDiv = document.getElementById('gantt-chart');
           let totaltime = 0;
+          let contextSwitch=0;
+          let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+          if( c !== 0)
+            {
+                contextSwitch=c;
+            }
           let ganttChartHTML = `
           <table>
               <tr>
-                  <th>Process</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-              </tr>
           `;
       
-              // Sort processes by arrival time and burst time (SRTF)
+          // Sort processes by arrival time and burst time (SRTF)
           const sortedProcesses = executionorder.slice().sort((a, b) => {
               const arrivalDiff = arrivalTimes[a.process - 1].value - arrivalTimes[b.process - 1].value;
               if (arrivalDiff === 0) 
@@ -402,90 +496,118 @@
               totaltime = endTime;
       
               ganttChartHTML += `
-              <tr>
-                  <td>Process ${processNumber}</td>
-                  <td>${startTime}</td>
-                  <td>${endTime}</td>
-              </tr>
+                  <th colspan=2>Process ${processNumber}</th>
+                  <th colspan=2 class="cpu">CPU Switch</th>
               `;
           }
       
-          ganttChartHTML += `</table>`;
-          ganttChartDiv.innerHTML = ganttChartHTML;
-      }
-      //*************** RR - GANTT******************
-      function GanttRR(executionorder, arrivalTimes, burstTimes, quantum) 
-      {
-          let totaltime = 0;
-          let remaingBT = [];
-          let completedProcesses = [];
+          ganttChartHTML += `</tr><tr>`;
       
-          // Initialize remaining burst times
-          for (let i = 0; i < burstTimes.length; i++) 
+          totaltime = 0;
+          for (let i = 0; i < sortedProcesses.length; i++) 
           {
-             remaingBT.push(parseInt(burstTimes[i].value));
-          }
-      
-          let currTime = 0;
-          let currentProcess = 0;
-          let timeSlice = quantum;
-          let ganttChartHTML = `
-          <table>
-              <tr>
-                  <th>Process</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-              </tr>
-          `;
-      
-          while (completedProcesses.length < executionorder.length) 
-          {
-              if (remainingBurstTimes[currentProcess] <= timeSlice &&remaingBT[currentProcess] > 0) 
-              {
-                  totaltime = currTime +remaingBT[currentProcess];
-                  currTime = totaltime;
-                  remaingBT[currentProcess] = 0;
-                  completedProcesses.push(executionorder[currentProcess]);
-              } 
-              else if (remainingBurstTimes[currentProcess] > 0) 
-              {
-                  totaltime = currTime + timeSlice;
-                  currTime = totaltime;
-                  remaingBT[currentProcess] -= timeSlice;
-              }
+              const processNumber = sortedProcesses[i].process;
+              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+              const burstTime = parseInt(burstTimes[processNumber - 1].value);
+              const startTime = Math.max(totaltime, arrivalTime);
+              const endTime = startTime + burstTime;
+              totaltime = endTime;
       
               ganttChartHTML += `
-              <tr>
-                  <td>Process ${executionorder[currentProcess].process}</td>
-                  <td>${currTime -remaingBT[currentProcess]}</td>
-                  <td>${currTime}</td>
-              </tr>
+                  <td>${startTime}</td>
+                  <td>${endTime}</td>
+                  <td colspan=2>${contextSwitch}</td>
               `;
-      
-              let nextProcess = (currentProcess + 1) % executionorder.length;
-              while (nextProcess !== currentProcess &&remaingBT[nextProcess] === 0) {
-                  nextProcess = (nextProcess + 1) % executionorder.length;
-              }
-              currentProcess = nextProcess;
           }
       
-          ganttChartHTML += `</table>`;
-           // Update the DOM to display the Gantt chart
-          const ganttChartContainer = document.getElementById('gantt-chart');
-          return ganttChartHTML;
+          ganttChartHTML += `</tr></table>`;
+          ganttChartDiv.innerHTML = ganttChartHTML;
       }
+      
+      //*************** RR - GANTT******************
+      function GanttRR(executionorder, arrivalTimes, burstTimes, quantum) {
+        let totaltime = 0;
+        let contextSwitch=0;
+          let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+          if( c !== 0)
+            {
+                contextSwitch=c;
+            }
+        let remainingBT = [];
+        let completedProcesses = [];
+    
+        // Initialize remaining burst times
+        for (let i = 0; i < burstTimes.length; i++) {
+            remainingBT.push(parseInt(burstTimes[i].value));
+        }
+    
+        let currTime = 0;
+        let currentProcess = 0;
+        let timeSlice = quantum;
+        let ganttChartHTML = `
+            <table>
+                <tr>
+                    <th>Process</th>
+        `;
+    
+        // Add headers for each process
+        for (let i = 0; i < executionorder.length; i++) {
+            ganttChartHTML += `
+                <th colspan="2">Process ${executionorder[i].process}</th>
+                <th colspan="2" class="cpu">CPU Switch</th>
+            `;
+        }
+    
+        ganttChartHTML += `</tr><tr>`;
+    
+        while (completedProcesses.length < executionorder.length) {
+            if (remainingBT[currentProcess] <= timeSlice && remainingBT[currentProcess] > 0) {
+                totaltime = currTime + remainingBT[currentProcess];
+                currTime = totaltime;
+                remainingBT[currentProcess] = 0;
+                completedProcesses.push(executionorder[currentProcess]);
+            } else if (remainingBT[currentProcess] > 0) {
+                totaltime = currTime + timeSlice;
+                currTime = totaltime;
+                remainingBT[currentProcess] -= timeSlice;
+            }
+    
+            // Add start and end time for the current process
+            ganttChartHTML += `
+                <td>${currTime - remainingBT[currentProcess]}</td>
+                <td>${currTime}</td>
+                <td colspan="2">${contextSwitch}</td>
+            `;
+    
+            let nextProcess = (currentProcess + 1) % executionorder.length;
+            while (nextProcess !== currentProcess && remainingBT[nextProcess] === 0) {
+                nextProcess = (nextProcess + 1) % executionorder.length;
+            }
+            currentProcess = nextProcess;
+        }
+    
+        ganttChartHTML += `</tr></table>`;
+    
+        // Return the Gantt chart HTML
+        return ganttChartHTML;
+    }
+    
+      
+
       //*************** Priority - GANTT******************
       function GanttPriority(executionorder, arrivalTimes, burstTimes) 
       {
           const ganttChartDiv = document.getElementById('gantt-chart');
           let totaltime = 0;
+          let contextSwitch=0;
+          let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
+          if( c !== 0)
+            {
+                contextSwitch=c;
+            }
           let ganttChartHTML = `
           <table>
               <tr>
-                  <th>Process</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-              </tr>
           `;
       
           for (let i = 0; i < executionorder.length; i++) 
@@ -497,18 +619,38 @@
               const endTime = startTime + burstTime;
               totaltime = endTime;
       
+              // Add the process and CPU switch columns horizontally
               ganttChartHTML += `
-              <tr>
-                  <td>Process ${processNumber}</td>
-                  <td>${startTime}</td>
-                  <td>${endTime}</td>
-              </tr>
+                  <th colspan=2>Process ${processNumber}</th>
+                  <th colspan=2 class="cpu">CPU Switch</th>
               `;
           }
       
-          ganttChartHTML += `</table>`;
+          ganttChartHTML += `</tr><tr>`;
+      
+          totaltime = 0;
+          for (let i = 0; i < executionorder.length; i++) 
+          {
+              const processNumber = executionorder[i].process;
+              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+              const burstTime = parseInt(burstTimes[processNumber - 1].value);
+              const startTime = Math.max(totaltime, arrivalTime);
+              const endTime = startTime + burstTime;
+              totaltime = endTime;
+      
+              // Print the start time, end time, and CPU switch
+              ganttChartHTML += `
+                  <td>${startTime}</td>
+                  <td>${endTime}</td>
+                  <td colspan=2>${contextSwitch}</td>
+              `;
+          }
+      
+          ganttChartHTML += `</tr></table>`;
           ganttChartDiv.innerHTML = ganttChartHTML;
       }
+      
+
       //-----------------DISPLAY---------------
       function displayResults(executionorder, avgWT, avgTAT) 
       {
@@ -516,7 +658,7 @@
           resultDiv.innerHTML = `
           <div class="step">Execution Order:</div>
               <div class="execution-order">
-                  ${executionorder.map((step, index) => `<div>Step ${index + 1}: Process ${step.process} (Waiting Time: ${step.waiting})</div>`).join('')}
+                  ${executionorder.map((i, index) => `<div>Step ${index + 1}: Process ${i.process} (Waiting Time: ${i.waiting})</div><br>`).join('')}
               </div>
               <div class="average-times">
                   <div>Average Waiting Time: ${avgWT.toFixed(2)}</div>
@@ -550,20 +692,7 @@
           }
       }
       
-      function toggleTQ() 
-      {
-          const algorithm = document.getElementById('algorithm').value;
-          const TQInput = document.getElementById('time-quantum');
       
-          if (algorithm === 'rr') 
-          {
-              TQInput.disabled = false;
-          }
-          else 
-          {
-              TQInput.disabled = true;
-          }
-      }
       
       
       
