@@ -1,667 +1,570 @@
+      //document.addEventListener('DOMContentLoaded', function() {
 
-let processCounter = 1;
-
-let processes = [];
-
-// Add Process Form Submission
-
-document.getElementById('add-process-form').addEventListener('submit', function(e) {
-
-  e.preventDefault();
-
-  let arrivalTime = parseInt(document.getElementById('arrival-time').value);
-
-  let burstTime = parseInt(document.getElementById('burst-time').value);
-
-  processes.push({ id: processCounter++, arrivalTime, burstTime });
-
-  updateProcessTable();
-
-  document.getElementById('arrival-time').value = '';
-
-  document.getElementById('burst-time').value = '';
-
-});
-
-
-
-
-  // Update Process Table
-
-  function updateProcessTable()
-
-    {
-
-        let tableBody = document.getElementById('process-table').getElementsByTagName('tbody')[0];
-
-        let newRow = tableBody.insertRow();
-
-        let lastProcess = processes[processes.length - 1];
-
-        newRow.innerHTML = `<td>${lastProcess.id}</td><td>${lastProcess.arrivalTime}</td><td>${lastProcess.burstTime}</td>`;
-
-  }
-
-// Select Algorithm Form Submission
-
-    document.getElementById('select-algorithm-form').addEventListener('submit', function(e)
-
-    {
-
-        e.preventDefault();
-
-        let algorithm = document.getElementById('algorithm').value;
-
-        if (algorithm === 'fcfs')
-
-        {
-
-            let waitingTime = calculateWaitingTimeForFCFS();
-
-            let turnaroundTime = calculateTurnaroundTimeForFCFS();//CHNGE DONE
-
-            displayResult(waitingTime, turnaroundTime);
-
-            drawGanttChart();
-
-        }
-
-        if (algorithm === 'sjf') 
-        {
-
-            let waitingTime = calculateWaitingTimeForSJF();
-
-            let turnaroundTime = calculateTurnaroundTimeForSJF();
-
-            displayResult(waitingTime, turnaroundTime);
-
-            drawGanttChart();
-
-        }
-        if (algorithm === 'srtf') 
-        {
-
-            let waitingTime = calculateWaitingTimeForSRTF();
-
-            let turnaroundTime = calculateTurnaroundTimeForSRTF();
-
-            displayResult(waitingTime, turnaroundTime);
-
-            drawGanttChart();
-
-        }
-
-        if (algorithm === 'rr') 
-        {
-            let timeQuantum = 5; // Time Quantum for Round Robin
-
-            let waitingTime = calculateWaitingTimeForRR(timeQuantum);
-
-            let turnaroundTime = calculateTurnaroundTimeForRR();
-
-            displayResult(waitingTime, turnaroundTime);
-
-            drawGanttChart();
-
-        }
-
-        if (algorithm === 'priority') 
-        {
-
-            let waitingTime = calculateWaitingTimeForPriority();
-
-            let turnaroundTime = calculateTurnaroundTimeForPriority();
-
-            displayResult(waitingTime, turnaroundTime);
-
-            drawGanttChart();
-
-        }
-
-
-  // Add conditions for other algorithms if needed
-
-    });
-
-//---------------------------------------FCFS------------------------------------------------
-
-   // Calculate Waiting Time for FCFS
-
-   function calculateWaitingTimeForFCFS()
-
-   {
-
-    let totalWaitingTime = 0;
-    let completionTime = processes[0].arrivalTime + processes[0].burstTime; // Completion time of the first process
-
-    for (let i = 1; i < processes.length; i++)
-
-    {
-        totalWaitingTime += completionTime - processes[i].arrivalTime;
-        completionTime += processes[i].burstTime; // Increment completion time by burst time of the current process
-    }
-    return totalWaitingTime / processes.length;
-
-    }
-
-   
-
-    function calculateTurnaroundTimeForFCFS()   // Calculate Turnaround Time for FCFS
-
-    {
-
-        let totalTurnaroundTime = 0;
-        totalTurnaroundTime += processes[0].burstTime;
-        let waiting =0;
-        let completionTime = processes[0].arrivalTime + processes[0].burstTime; // Completion time of the first process
-
-        for (let i = 1; i < processes.length; i++)
-        {
-            waiting = completionTime - processes[i].arrivalTime; // Add waiting time
-            totalTurnaroundTime += waiting +  processes[i].burstTime;
-            completionTime += processes[i].burstTime; // Increment completion time by burst time of the current process
-        }
-    return totalTurnaroundTime / processes.length;
-
-    }
-
-   
-  
-
-   
-
-//-----------------------------------SJF---------------------------------------    
-
-    function calculateTurnaroundTimeForSJF() 
-    {
-        let totalTurnaroundTime = 0;
-        let waitingTime = 0;
-        let completionTime = 0;
-
-        // Sort processes based on burst time
-        processes.sort((a, b) => a.burstTime - b.burstTime);
-
-        // Calculate waiting time and turnaround time for each process
-        for (let i = 0; i < processes.length; i++) 
-        {
-            waitingTime += processes[i].arrivalTime - completionTime;
-            completionTime += processes[i].burstTime;
-            processes[i].waitingTime = waitingTime;
-            processes[i].turnaroundTime = waitingTime + processes[i].burstTime;
-            totalTurnaroundTime += processes[i].turnaroundTime;
-    }
-
-    return totalTurnaroundTime / processes.length;
-    }
-
-    function calculateWaitingTimeForSJF()
-    {
-        let totalWaitingTime = 0;
-        let waitingTime = 0;
-        let completionTime = 0;
-
-        // Sort processes based on burst time
-        processes.sort((a, b) => a.burstTime - b.burstTime);
-
-        // Calculate waiting time and turnaround time for each process
-        for (let i = 0; i < processes.length; i++) 
-        {
-            waitingTime += processes[i].arrivalTime - completionTime;
-            completionTime += processes[i].burstTime;
-            processes[i].waitingTime = waitingTime;
-            processes[i].turnaroundTime = waitingTime + processes[i].burstTime;
-            totalWaitingTime += waitingTime;
-        }
-    return totalWaitingTime / processes.length;
-    }
-
-//-----------------------------------------------RR-----------------------------------------
-    function calculateWaitingTimeForRR(timeQuantum) 
-    {
-        let remainingTime = [];
-        let waitingTime = 0;
-
-        // Initialize remaining time for all processes
-        for (let i = 0; i < processes.length; i++) {
-            remainingTime.push(processes[i].burstTime);
-        }
-
-        let currentTime = 0;
-        let queue = [];
-
-        while (true) {
-            let done = true;
-
-            // Traverse all processes
-            for (let i = 0; i < processes.length; i++) {
-            if (remainingTime[i] > 0) {
-                done = false;
-
-                // If burst time is greater than time quantum, process for time quantum
-                if (remainingTime[i] > timeQuantum) {
-                currentTime += timeQuantum;
-                remainingTime[i] -= timeQuantum;
-                queue.push(i); // Move the process to the end of the queue
-                } else {
-                // If burst time is smaller than or equal to time quantum, process it completely
-                currentTime += remainingTime[i];
-                waitingTime += currentTime - processes[i].burstTime;
-                remainingTime[i] = 0;
-                }
-            }
-            }
-
-            // If all processes are done
-            if (done === true) {
-            break;
-            }
-
-            // If there are processes in the queue, process them
-            if (queue.length > 0) {
-            let index = queue.shift();
-            waitingTime += currentTime - processes[index].burstTime;
-            remainingTime[index] = 0;
-            }
-        }
-
-        return waitingTime / processes.length;
-        // Implement waiting time calculation logic for RR algorithm
-
-    }
-
-    // Calculate Turnaround Time for RR
-    function calculateTurnaroundTimeForRR(timeQuantum)
-    {
-        let remainingTime = [];
-        let turnaroundTime = 0;
-
-        // Initialize remaining time for all processes
-        for (let i = 0; i < processes.length; i++) {
-            remainingTime.push(processes[i].burstTime);
-        }
-
-        let currentTime = 0;
-        let queue = [];
-
-        while (true) {
-            let done = true;
-
-            // Traverse all processes
-            for (let i = 0; i < processes.length; i++) {
-            if (remainingTime[i] > 0) {
-                done = false;
-
-                // If burst time is greater than time quantum, process for time quantum
-                if (remainingTime[i] > timeQuantum)
-                {
-                    currentTime += timeQuantum;
-                    remainingTime[i] -= timeQuantum;
-                    queue.push(i); // Move the process to the end of the queue
-                } 
-                else 
-                {
-                // If burst time is smaller than or equal to time quantum, process it completely
-                    currentTime += remainingTime[i];
-                    turnaroundTime += currentTime - processes[i].arrivalTime;
-                    remainingTime[i] = 0;
-                }
-            }
-            }
-
-            // If all processes are done
-            if (done === true) {
-            break;
-            }
-
-            // If there are processes in the queue, process them
-            if (queue.length > 0) 
-            {
-                let index = queue.shift();
-                turnaroundTime += currentTime - processes[index].arrivalTime;
-                remainingTime[index] = 0;
-            }
-        }
-
-    return turnaroundTime / processes.length;
-    }
-
-//-------------------------------------PRIORITY-------------------------------
-    function calculateWaitingTimeForPriority()
-    {
-
-        // Implement waiting time calculation logic for Priority Scheduling algorithm
-
-    }
-    function calculateTurnaroundTimeForPriority()
-    {
-        
-    }
-//------------------------------------SRTF--------------------------------
-    function calculateWaitingTimeForSRTF() 
-    {
-      let totalWaitingTime = 0;
-      let remainingTime = [];
-      let completed = 0;
-      let currentTime = 0;
-
-      processes.forEach(process => {        
-                                    remainingTime.push(process.burstTime);  });
-
-      while (completed < processes.length) 
+      function addProcessFields() 
       {
-        let shortest = processes.length - 1;
-        for (let i = 0; i < processes.length; i++) 
-        {
-          if (processes[i].arrivalTime <= currentTime && remainingTime[i] < remainingTime[shortest] && remainingTime[i] > 0) 
+          const processCount = parseInt(document.getElementById('process-count').value);
+          const processFieldsDiv = document.getElementById('process-fields');
+          processFieldsDiv.innerHTML = '';
+      
+          for (let i = 1; i <= processCount; i++) 
           {
-            shortest = i;
+              const processDiv = document.createElement('div');
+              const arrivalLabel = `<label for="arrival-time-${i}"><b>PROCESS ${i}</b> </label>`;
+              const inputs = `
+                  <label for="arrival-time-${i}"> Arrival Time:</label>
+                  <input type="number" id="arrival-time-${i}" class="arrival-time">
+                  <label for="burst-time-${i}">Burst Time:</label>
+                  <input type="number" id="burst-time-${i}" class="burst-time">
+                  <br>
+                  <label for="priority-${i}">Priority:</label>
+                  <input type="number" id="priority-${i}" class="priority">
+              `;
+              processDiv.innerHTML = arrivalLabel + inputs;
+              processFieldsDiv.appendChild(processDiv);
           }
-        }
-        remainingTime[shortest]--;
-        currentTime++;
-
-        if (remainingTime[shortest] === 0) 
-        {
-          completed++;
-          totalWaitingTime += currentTime - processes[shortest].arrivalTime - processes[shortest].burstTime;
-        }
       }
-
-      return totalWaitingTime / processes.length;
-    }
-
-    function calculateTurnaroundTimeForSRTF() 
-    {
-        let totalTurnaroundTime = 0;
-        let remainingTime = [];
-        let completed = 0;
-        let currentTime = 0;
-
-        processes.forEach(process => {
-            remainingTime.push(process.burstTime);
-        });
-
-        while (completed < processes.length) {
-            let shortest = processes.length - 1;
-            for (let i = 0; i < processes.length; i++) {
-            if (processes[i].arrivalTime <= currentTime && remainingTime[i] < remainingTime[shortest] && remainingTime[i] > 0) {
-                shortest = i;
-            }
-            }
-            remainingTime[shortest]--;
-            currentTime++;
-
-            if (remainingTime[shortest] === 0) {
-            completed++;
-            totalTurnaroundTime += currentTime - processes[shortest].arrivalTime;
-            }
-        }
-
-        return totalTurnaroundTime / processes.length;
-    }
-
-
- // ----------------------------------------Calculate WAITING TIME FOR ALLLLLL ALGOOSS----------------------
-
-    function calculateWaitingTime(algorithm)
-
-    {
-
-        let totalWaitingTime = 0;
-
-        switch  (algorithm)
-
-        {
-
-            case 'fcfs':
-
-                totalWaitingTime=calculateWaitingTimeForFCFS(); // FCFS algorithm: Waiting time is CT - BT - AT (Completion Time - Burst Time - Arrival Time)
-                break;
-
-            case 'sjf':
-                
-                totalWaitingTime = calculateWaitingTimeForSJF();
-                break;
-
-            case 'srtf':
-    
-                totalWaitingTime = calculateWaitingTimeForSRTF();  // SRTF algorithm: Waiting time is the difference between the completion time and the arrival time of each process.
-                break;
-
-            case 'rr':
-
-                totalWaitingTime = calculateWaitingTimeForRR();     // RR algorithm: Waiting time is calculated differently based on the round robin logic.
-                break;
-
-            case 'priority':
-
-                totalWaitingTime = calculateWaitingTimeForPriority();   // Priority Scheduling algorithm: Waiting time is calculated based on priority and arrival time.
-                break;
-
-        }
-
-    return totalWaitingTime ;// Calculate average waiting time
-    }
-
-// ------------------------------------------------Calculate  TURN AROUND TIME FOR ALLLLLL ALGOOSS-----------------------------
-
-function calculateTurnaroundTime(algorithm)
-
-{
-
-  let totalTurnaroundTime = 0;  // Turnaround time is the sum of waiting time and burst time for each process.
-  switch (algorithm)
-  {
-
-    case 'fcfs':
-
-        totalTurnaroundTime = calculateTurnaroundTimeForFCFS();
-        break;
-
-    case 'sjf':
-
-        totalTurnaroundTime = calculateTurnaroundTimeForSJF();
-        break;
-
-    
-    case 'srtf':
-    
-        totalTurnaroundTime = calculateTurnaroundTimeForSRTF();
-        break;   
-    
-
-    case 'rr':
-    
-        totalTurnaroundTime = calculateTurnaroundTimeForRR();
-        break;   
-    
-
-    case 'priority':
-    
-        totalTurnaroundTime = calculateTurnaroundTimeForPriority();
-        break;   
-
-    return totalTurnaroundTime ;// Calculate average turnaround time
-
-    }
-}
-
-
-// Display Result
-
-function displayResult(waitingTime, turnaroundTime) 
-{
-
-  document.getElementById("waiting-time").textContent = `Waiting Time: ${waitingTime}`;
-
-  document.getElementById("turnaround-time").textContent = `Turnaround Time: ${turnaroundTime}`;
-
-  document.getElementById("result-container").style.display = "block";
-
-    if (waitingTime === calculateWaitingTimeForFCFS()) 
-    {
-
-        document.getElementById("waiting-time").textContent = `Waiting Time: ${calculateWaitingTimeForFCFS()}`; 
-        document.getElementById("turnaround-time").textContent = `Turnaround Time: ${calculateTurnaroundTimeForFCFS()}`;
-
-    }
-
-
-    if (waitingTime === calculateWaitingTimeForSJF()) 
-    {
-
-        document.getElementById("waiting-time").textContent = `Waiting Time: ${calculateWaitingTimeForSJF()}`;
-        document.getElementById("turnaround-time").textContent = `Turnaround Time: ${calculateTurnaroundTimeForSJF()}`;
-
-    }
-
-    if (waitingTime === calculateWaitingTimeForSRTF()) 
-    {
-
-        document.getElementById("waiting-time").textContent = `Waiting Time: ${calculateWaitingTimeForSRTF()}`;
-        document.getElementById("turnaround-time").textContent = `Turnaround Time: ${calculateTurnaroundTimeForSRTF()}`;
-
-    }
-
-    if (waitingTime === calculateWaitingTimeForRR()) 
-    {
-
-        document.getElementById("waiting-time").textContent = `Waiting Time: ${calculateWaitingTimeForRR()}`;
-        document.getElementById("turnaround-time").textContent = `Turnaround Time: ${calculateTurnaroundTimeForRR()}`;
-
-    }
-
-    if (waitingTime === calculateWaitingTimeForPriority()) 
-    {
-
-        document.getElementById("waiting-time").textContent = `Waiting Time: ${calculateWaitingTimeForPriority()}`;
-        document.getElementById("turnaround-time").textContent = `Turnaround Time: ${calculateTurnaroundTimeForPriority()}`;
-
-    }
-
-}
-   
-
-    // Draw Gantt Chart
-/*
-    function drawGanttChart()
-
-    {
-
-            let ganttChart = document.getElementById('gantt-chart');
-
-            let table = document.createElement('table');
-
-            let headerRow = table.insertRow();
-
-            headerRow.innerHTML = '<th>Process ID</th><th>Start Time</th><th>End Time</th>';
-
-            let completionTime = processes[0].arrivalTime;
-
-        // Initialize completion time with the arrival time of the first process
-
-        for (let i = 0; i < processes.length; i++)
-
-        {
-
-            let row = table.insertRow();
-
-            let idCell = row.insertCell();
-
-            let startTimeCell = row.insertCell();
-
-            let endTimeCell = row.insertCell();
-
-            idCell.textContent = processes[i].id;
-
-            startTimeCell.textContent = completionTime;
-
-            completionTime += processes[i].burstTime; // Increment completion time by burst time of the current process
-
-            endTimeCell.textContent = completionTime;
-
-            row.classList.add('process'); // Apply 'process' class to the entire row
-
-        }
-
-    ganttChart.innerHTML = '';
-    ganttChart.appendChild(table);
-
-    }*/
-    function drawGanttChart() 
-    {
-        let ganttChart = document.getElementById('gantt-chart');
-        let table = document.createElement('table');
-        let headerRow = table.insertRow();
-        headerRow.innerHTML = '<th>Process ID</th><th>Start Time</th><th>End Time</th>';
-
-        let completionTime = 0;
-        let processOrder = []; // Array to hold the order of processes
-        let algorithm = document.getElementById('algorithm').value;
-
-        // Select processes order based on algorithm
-        switch (algorithm) {
-            case 'fcfs':
-                processOrder = processes.slice().sort((a, b) => a.arrivalTime - b.arrivalTime);
-                break;
-            case 'sjf':
-                processOrder = processes.slice().sort((a, b) => a.burstTime - b.burstTime);
-                break;
-            case 'srtf':
-                // In SRTF, we need to simulate preemptive execution, so we will need to iterate through time
-                let remainingTime = Array.from(processes, p => p.burstTime);
-                while (processes.length > 0) {
-                    let shortestIndex = -1;
-                    let shortestTime = Infinity;
-                    for (let i = 0; i < processes.length; i++) 
-                    {
-                        if (processes[i].arrivalTime <= completionTime && remainingTime[i] < shortestTime && remainingTime[i] > 0) {
-                            shortestIndex = i;
-                            shortestTime = remainingTime[i];
-                        }
-                    }
-                    if (shortestIndex === -1) 
-                    {
-                        completionTime++;
-                    } 
-                    else 
-                    {
-                        let currentProcess = processes[shortestIndex];
-                        let startTime = Math.max(completionTime, currentProcess.arrivalTime);
-                        let endTime = startTime + 1;
-                        completionTime = endTime;
-                        remainingTime[shortestIndex]--;
-                        if (remainingTime[shortestIndex] === 0) {
-                            processes.splice(shortestIndex, 1);
-                        }
-                        let row = table.insertRow();
-                        row.insertCell().textContent = currentProcess.id;
-                        row.insertCell().textContent = startTime;
-                        row.insertCell().textContent = endTime;
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-
-        // For FCFS and SJF, we can draw the Gantt chart directly from the sorted process order
-        if (algorithm !== 'srtf') {
-            processOrder.forEach(process => {
-                let row = table.insertRow();
-                let startTime = Math.max(completionTime, process.arrivalTime);
-                let endTime = startTime + process.burstTime;
-                completionTime = endTime;
-                row.insertCell().textContent = process.id;
-                row.insertCell().textContent = startTime;
-                row.insertCell().textContent = endTime;
-            });
-        }
-
-        ganttChart.innerHTML = '';
-        ganttChart.appendChild(table);
-    }
-
-
-    // Draw Gantt chart when the page is loaded
-    window.onload = drawGanttChart;
+      
+      function runAlgorithm() 
+      {
+          const algorithm = document.getElementById('algorithm').value;
+          let resultClass = '';
+      
+          switch (algorithm) 
+          {
+              case 'fcfs':
+                  resultClass = 'result-fcfs';
+                  runFCFS();
+                  break;
+      
+              case 'sjf':
+                  resultClass = 'result-sjf';
+                  runSJF();
+                  break;
+      
+              case 'rr':
+                  resultClass = 'result-rr';
+                  const TQ = parseInt(document.getElementById('time-quantum').value);
+                  runRR(TQ);
+                  break;
+      
+              case 'srtf':
+                  resultClass = 'result-srtf';
+                  runSRTF(); // Call the SRTF function
+                  break;
+      
+              case 'priority':
+                  resultClass = 'result-priority';
+                  runPriority();
+                  break;
+      
+          }
+      
+          document.getElementById('result').className = resultClass;
+         
+             
+      }
+      //------------------------------FUNCTIONSS-------------------    
+      
+      //-------------1. FCFS--------------
+      function runFCFS() 
+      {
+          const arrivalTimes = document.querySelectorAll('.arrival-time');
+          const burstTimes = document.querySelectorAll('.burst-time');
+          // INITIALISE VARIABLESS
+          let totaltime = 0;
+          let waitng = 0;
+          let tatime = 0;
+          let executionorder = [];
+      // Create an array to hold objects representing processes
+          const processes = [];
+          for (let i = 0; i < arrivalTimes.length; i++) 
+          {
+              processes.push({
+                  arrivalTime: parseInt(arrivalTimes[i].value),
+                  burstTime: parseInt(burstTimes[i].value),
+                  process: i + 1
+                  });
+          }
+          // Sort processes based on their arrival times
+          processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+      
+          // Execute processes in FCFS order
+          for (const process of processes) 
+          {
+              const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime;
+              const waiting = Math.max(0, totaltime - process.arrivalTime);
+              waitng += waiting;
+              tatime += completionTime - process.arrivalTime;
+              totaltime = completionTime;
+      
+              executionorder.push({ process: process.process, waiting });
+          }
+      
+          // Call the FCFS-specific Gantt chart generation function
+        
+      
+          const avgWT = waitng / arrivalTimes.length;
+          const avgTAT = tatime / arrivalTimes.length;
+          displayResults(executionorder, avgWT, avgTAT);
+      }
+      
+      
+      //-------------2. SJF--------------
+      function runSJF() 
+      {
+          const arrivalTimes = document.querySelectorAll('.arrival-time');
+          const burstTimes = document.querySelectorAll('.burst-time');
+          let totaltime = 0;
+          let waitng = 0;
+          let tatime = 0;
+          let executionorder = [];
+      
+          // Convert NodeList to array and sort processes by burst time
+          const processes = Array.from(burstTimes).map((burstTime, index) => ({
+              process: index + 1,
+              arrivalTime: parseInt(arrivalTimes[index].value),
+              burstTime: parseInt(burstTime.value)
+          })).sort((a, b) => a.burstTime - b.burstTime || a.arrivalTime - b.arrivalTime);
+      
+          for (const process of processes) 
+          {
+              const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime;
+              const waiting = Math.max(0, totaltime - process.arrivalTime);
+              waitng += waiting;
+              tatime += completionTime - process.arrivalTime;
+              totaltime = completionTime;
+      
+              executionorder.push({ process: process.process, waiting });
+          }
+      
+          const avgWT = waitng / processes.length;
+          const avgTAT = tatime / processes.length;
+          displayResults(executionorder, avgWT, avgTAT);
+      }
+      
+      //-------------3. RR--------------
+      function runRR(TQ) 
+      {
+          const arrivalTimes = document.querySelectorAll('.arrival-time');
+          const burstTimes = document.querySelectorAll('.burst-time');
+          let totaltime = 0;
+          let waitng = 0;
+          let tatime = 0;
+          let executionorder = [];
+      
+          const processes = Array.from(burstTimes).map((burstTime, index) => ({
+              process: index + 1,
+              arrivalTime: parseInt(arrivalTimes[index].value),
+              burstTime: parseInt(burstTime.value),
+              remainingBurstTime: parseInt(burstTime.value)
+          }));
+      
+          while (processes.some(process => process.remainingBurstTime > 0)) 
+          {
+              for (const process of processes) 
+              {
+                  if (process.remainingBurstTime === 0) continue;
+                  const quantum = Math.min(TQ, process.remainingBurstTime);
+                  const completionTime = Math.min(process.arrivalTime + totaltime + quantum, totaltime + process.remainingBurstTime);
+                  const waiting = Math.max(0, totaltime - process.arrivalTime);
+                  waitng += waiting;
+                  tatime += completionTime - process.arrivalTime;
+                  totaltime = completionTime;
+      
+                  executionorder.push({ process: process.process, waiting });
+      
+                  process.remainingBurstTime -= quantum;
+              }
+          }
+      
+          const avgWT = waitng / processes.length;
+          const avgTAT = tatime / processes.length;
+          displayResults(executionorder, avgWT, avgTAT);
+      }
+      
+      //-------------4. SRTF--------------
+      function runSRTF() 
+      {
+                  const arrivalTimes = document.querySelectorAll('.arrival-time');
+                  const burstTimes = document.querySelectorAll('.burst-time');
+                  let totaltime = 0;
+                  let waitng = 0;
+                  let tatime = 0;
+                  let executionorder = [];
+      
+                  // Convert NodeList to array and sort processes by remaining burst time
+                  const processes = Array.from(burstTimes).map((burstTime, index) => ({
+                      process: index + 1,
+                      arrivalTime: parseInt(arrivalTimes[index].value),
+                      burstTime: parseInt(burstTime.value),
+                      remainingBurstTime: parseInt(burstTime.value)
+                  })).sort((a, b) => a.remainingBurstTime - b.remainingBurstTime || a.arrivalTime - b.arrivalTime);
+      
+                  while (processes.some(process => process.remainingBurstTime > 0)) {
+                      let shortestProcessIndex = -1;
+                      let shortestBurstTime = Infinity;
+      
+                      for (let i = 0; i < processes.length; i++) 
+                      {
+                          if (processes[i].arrivalTime <= totaltime && processes[i].remainingBurstTime < shortestBurstTime && processes[i].remainingBurstTime > 0) 
+                          {
+                              shortestBurstTime = processes[i].remainingBurstTime;
+                              shortestProcessIndex = i;
+                          }
+                      }
+      
+                      if (shortestProcessIndex === -1) 
+                      {
+                          totaltime++;
+                          continue;
+                      }
+      
+                      const process = processes[shortestProcessIndex];
+                      const completionTime = totaltime + 1;
+                      const waiting = totaltime - process.arrivalTime;
+                      waitng += waiting;
+                      tatime += completionTime - process.arrivalTime;
+                      totaltime = completionTime;
+      
+                      executionorder.push({ process: process.process, waiting });
+      
+                      process.remainingBurstTime--;
+      
+                      if (process.remainingBurstTime === 0) 
+                      {
+                          // Remove completed process from the array
+                          processes.splice(shortestProcessIndex, 1);
+                      }
+                  }
+      
+                  const avgWT = waitng / (arrivalTimes.length - processes.length);
+                  const avgTAT = tatime / (arrivalTimes.length - processes.length);
+                  displayResults(executionorder, avgWT, avgTAT);
+              }
+      
+      //-------------5. PRIORIRTY--------------
+          function runPriority() 
+          {
+              const arrivalTimes = document.querySelectorAll('.arrival-time');
+              const burstTimes = document.querySelectorAll('.burst-time');
+              const priorities = document.querySelectorAll('.priority');
+              let totaltime = 0;
+              let waitng = 0;
+              let tatime = 0;
+              let executionorder = [];
+      
+              // Convert NodeList to array and sort processes by priority
+              const processes = Array.from(burstTimes).map((burstTime, index) => ({
+                  process: index + 1,
+                  arrivalTime: parseInt(arrivalTimes[index].value),
+                  burstTime: parseInt(burstTime.value),
+                  priority: parseInt(priorities[index].value)
+              })).sort((a, b) => a.priority - b.priority || a.arrivalTime - b.arrivalTime);
+      
+              for (const process of processes) 
+              {
+                  const completionTime = Math.max(process.arrivalTime, totaltime) + process.burstTime;
+                  const waiting = Math.max(0, totaltime - process.arrivalTime);
+                  waitng += waiting;
+                  tatime += completionTime - process.arrivalTime;
+                  totaltime = completionTime;
+      
+                  executionorder.push({ process: process.process, waiting });
+              }
+      
+              const avgWT = waitng / processes.length;
+              const avgTAT = tatime / processes.length;
+              displayResults(executionorder, avgWT, avgTAT);
+          }
+      //------------------END OF ALGOOOSSSSS-------------------------    
+      //----------------GANTT-----------------
+      function toggleGantt() 
+      {
+          const ganttChart = document.getElementById('gantt-chart');
+          const checkbox = document.getElementById('show-gantt-checkbox');
+      
+          if (checkbox.checked) 
+          {
+              ganttChart.style.display = 'block';
+          }
+          else 
+          {
+              ganttChart.style.display = 'none';
+          }
+      }
+      
+      //*************** FCFS - GANTT ******************
+      function GanttFCFS(executionorder, arrivalTimes, burstTimes) 
+      {
+          const ganttChartDiv = document.getElementById('gantt-chart');
+          let totaltime = 0;
+          let ganttChartHTML = `
+          <table>
+              <tr>
+                  <th>Process</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+              </tr>
+          `;
+          
+          for (let i = 0; i < executionorder.length; i++) 
+          {
+              const processNumber = executionorder[i].process;
+              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+              const burstTime = parseInt(burstTimes[processNumber - 1].value);
+              const startTime = Math.max(totaltime, arrivalTime);
+              const endTime = startTime + burstTime;
+              totaltime = endTime;
+      
+              ganttChartHTML += `
+              <tr>
+                  <td>Process ${processNumber}</td>
+                  <td>${startTime}</td>
+                  <td>${endTime}</td>
+              </tr>
+              `;
+          }
+      
+          ganttChartHTML += `</table>`;
+          ganttChartDiv.innerHTML = ganttChartHTML;
+      }
+      
+      //*************** SJF - GANTT******************
+      function GanttSJF(executionorder, arrivalTimes, burstTimes) 
+      {
+          const ganttChartDiv = document.getElementById('gantt-chart');
+          let totaltime = 0;
+          let ganttChartHTML = `
+          <table>
+              <tr>
+                  <th>Process</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+              </tr>
+          `;
+      
+          // Sort processes by burst time
+          const sortedProcesses = executionorder.slice().sort((a, b) => {
+              return parseInt(burstTimes[a.process - 1].value) - parseInt(burstTimes[b.process - 1].value);
+          });
+      
+          for (let i = 0; i < sortedProcesses.length; i++) {
+              const processNumber = sortedProcesses[i].process;
+              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+              const burstTime = parseInt(burstTimes[processNumber - 1].value);
+              const startTime = Math.max(totaltime, arrivalTime);
+              const endTime = startTime + burstTime;
+              totaltime = endTime;
+      
+              ganttChartHTML += `
+              <tr>
+                  <td>Process ${processNumber}</td>
+                  <td>${startTime}</td>
+                  <td>${endTime}</td>
+              </tr>
+              `;
+          }
+      
+          ganttChartHTML += `</table>`;
+          ganttChartDiv.innerHTML = ganttChartHTML;
+      }
+      //*************** SRTF - GANTT******************
+      function GanttSRTF(executionorder, arrivalTimes, burstTimes) 
+      {
+          const ganttChartDiv = document.getElementById('gantt-chart');
+          let totaltime = 0;
+          let ganttChartHTML = `
+          <table>
+              <tr>
+                  <th>Process</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+              </tr>
+          `;
+      
+              // Sort processes by arrival time and burst time (SRTF)
+          const sortedProcesses = executionorder.slice().sort((a, b) => {
+              const arrivalDiff = arrivalTimes[a.process - 1].value - arrivalTimes[b.process - 1].value;
+              if (arrivalDiff === 0) 
+              {
+                  return burstTimes[a.process - 1].value - burstTimes[b.process - 1].value;
+              }
+              return arrivalDiff;
+          });
+      
+          for (let i = 0; i < sortedProcesses.length; i++) 
+          {
+              const processNumber = sortedProcesses[i].process;
+              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+              const burstTime = parseInt(burstTimes[processNumber - 1].value);
+              const startTime = Math.max(totaltime, arrivalTime);
+              const endTime = startTime + burstTime;
+              totaltime = endTime;
+      
+              ganttChartHTML += `
+              <tr>
+                  <td>Process ${processNumber}</td>
+                  <td>${startTime}</td>
+                  <td>${endTime}</td>
+              </tr>
+              `;
+          }
+      
+          ganttChartHTML += `</table>`;
+          ganttChartDiv.innerHTML = ganttChartHTML;
+      }
+      //*************** RR - GANTT******************
+      function GanttRR(executionorder, arrivalTimes, burstTimes, quantum) 
+      {
+          let totaltime = 0;
+          let remaingBT = [];
+          let completedProcesses = [];
+      
+          // Initialize remaining burst times
+          for (let i = 0; i < burstTimes.length; i++) 
+          {
+             remaingBT.push(parseInt(burstTimes[i].value));
+          }
+      
+          let currTime = 0;
+          let currentProcess = 0;
+          let timeSlice = quantum;
+          let ganttChartHTML = `
+          <table>
+              <tr>
+                  <th>Process</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+              </tr>
+          `;
+      
+          while (completedProcesses.length < executionorder.length) 
+          {
+              if (remainingBurstTimes[currentProcess] <= timeSlice &&remaingBT[currentProcess] > 0) 
+              {
+                  totaltime = currTime +remaingBT[currentProcess];
+                  currTime = totaltime;
+                  remaingBT[currentProcess] = 0;
+                  completedProcesses.push(executionorder[currentProcess]);
+              } 
+              else if (remainingBurstTimes[currentProcess] > 0) 
+              {
+                  totaltime = currTime + timeSlice;
+                  currTime = totaltime;
+                  remaingBT[currentProcess] -= timeSlice;
+              }
+      
+              ganttChartHTML += `
+              <tr>
+                  <td>Process ${executionorder[currentProcess].process}</td>
+                  <td>${currTime -remaingBT[currentProcess]}</td>
+                  <td>${currTime}</td>
+              </tr>
+              `;
+      
+              let nextProcess = (currentProcess + 1) % executionorder.length;
+              while (nextProcess !== currentProcess &&remaingBT[nextProcess] === 0) {
+                  nextProcess = (nextProcess + 1) % executionorder.length;
+              }
+              currentProcess = nextProcess;
+          }
+      
+          ganttChartHTML += `</table>`;
+           // Update the DOM to display the Gantt chart
+          const ganttChartContainer = document.getElementById('gantt-chart');
+          return ganttChartHTML;
+      }
+      //*************** Priority - GANTT******************
+      function GanttPriority(executionorder, arrivalTimes, burstTimes) 
+      {
+          const ganttChartDiv = document.getElementById('gantt-chart');
+          let totaltime = 0;
+          let ganttChartHTML = `
+          <table>
+              <tr>
+                  <th>Process</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+              </tr>
+          `;
+      
+          for (let i = 0; i < executionorder.length; i++) 
+          {
+              const processNumber = executionorder[i].process;
+              const arrivalTime = parseInt(arrivalTimes[processNumber - 1].value);
+              const burstTime = parseInt(burstTimes[processNumber - 1].value);
+              const startTime = Math.max(totaltime, arrivalTime);
+              const endTime = startTime + burstTime;
+              totaltime = endTime;
+      
+              ganttChartHTML += `
+              <tr>
+                  <td>Process ${processNumber}</td>
+                  <td>${startTime}</td>
+                  <td>${endTime}</td>
+              </tr>
+              `;
+          }
+      
+          ganttChartHTML += `</table>`;
+          ganttChartDiv.innerHTML = ganttChartHTML;
+      }
+      //-----------------DISPLAY---------------
+      function displayResults(executionorder, avgWT, avgTAT) 
+      {
+          const resultDiv = document.getElementById('result');
+          resultDiv.innerHTML = `
+          <div class="step">Execution Order:</div>
+              <div class="execution-order">
+                  ${executionorder.map((step, index) => `<div>Step ${index + 1}: Process ${step.process} (Waiting Time: ${step.waiting})</div>`).join('')}
+              </div>
+              <div class="average-times">
+                  <div>Average Waiting Time: ${avgWT.toFixed(2)}</div>
+                  <div>Average Turnaround Time: ${avgTAT.toFixed(2)}</div>
+              </div>   
+          `;
+          // Generate and display Gantt chart
+      
+          const algorithm = document.getElementById('algorithm').value;
+          // Retrieve the values of arrivalTimes and burstTimes from the DOM
+          const arrivalTimes = document.querySelectorAll('.arrival-time');
+          const burstTimes = document.querySelectorAll('.burst-time');
+          switch (algorithm) 
+          {
+              case 'fcfs':
+                  GanttFCFS(executionorder, arrivalTimes, burstTimes);
+                  break;
+              case 'sjf':
+                  GanttSJF(executionorder, arrivalTimes, burstTimes);
+                  break;
+              case 'rr':
+                  const TQ = parseInt(document.getElementById('time-quantum').value);
+                  GanttRR(executionorder, arrivalTimes, burstTimes, TQ);
+                  break;
+              case 'srtf':
+                  GanttSRTF(executionorder, arrivalTimes, burstTimes);
+                  break;
+              case 'priority':
+                  GanttPriority(executionorder, arrivalTimes, burstTimes);
+                  break;
+          }
+      }
+      
+      function toggleTQ() 
+      {
+          const algorithm = document.getElementById('algorithm').value;
+          const TQInput = document.getElementById('time-quantum');
+      
+          if (algorithm === 'rr') 
+          {
+              TQInput.disabled = false;
+          }
+          else 
+          {
+              TQInput.disabled = true;
+          }
+      }
+      
+      
+      
+      //});
