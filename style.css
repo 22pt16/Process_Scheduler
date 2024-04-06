@@ -88,6 +88,10 @@ input[type="number"]
  color:#f7f9fc;
 }
 
+.gantt-chart th.cpu {
+     background-color: greenyellow;
+ }
+
 .gantt-chart td.process 
 {
  background-color: #6a0dad;
@@ -205,3 +209,7 @@ h1
 }
 
 
+td .cpu
+{
+     background-color: greenyellow;
+}
