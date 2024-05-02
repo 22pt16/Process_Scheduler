@@ -48,18 +48,18 @@
           {
               case 'fcfs':
                   resultClass = 'result-fcfs';
-                  runFCFS();
+                  runFCFS(); //calling fcfs
                   break;
       
               case 'sjf':
                   resultClass = 'result-sjf';
-                  runSJF();
+                  runSJF();//call sjf
                   break;
       
               case 'rr':
                   resultClass = 'result-rr';
                   const TQ = parseInt(document.getElementById('time-quantum').value);
-                  runRR(TQ);
+                  runRR(TQ);    //passing TQ
                   break;
       
               case 'srtf':
@@ -69,7 +69,7 @@
       
               case 'priority':
                   resultClass = 'result-priority';
-                  runPriority();
+                  runPriority(); //call prior
                   break;
       
           }
@@ -147,7 +147,7 @@
           let tatime = 0;
           let executionorder = [];
       
-          // Convert  and sort processes by burst time
+          // Convert  to array and sort processes by burst time
           const processes = Array.from(burstTimes).map((b, index) => ({
               process: index + 1,
               arrivalTime: parseInt(arrivalTimes[index].value),
@@ -232,7 +232,7 @@
                   let tatime = 0;
                   let executionorder = [];
       
-                  // Convert NodeList to array and sort processes by remaining burst time
+                  // Convert to array and sort processes by remaining burst time
                   const processes = Array.from(burstTimes).map((burstTime, index) => ({
                       process: index + 1,
                       arrivalTime: parseInt(arrivalTimes[index].value),
@@ -299,7 +299,7 @@
               let tatime = 0;
               let executionorder = [];
       
-              // Convert NodeList to array and sort processes by priority
+              // Convert to array and sort processes by priority
               const processes = Array.from(burstTimes).map((burstTime, index) => ({
                   process: index + 1,
                   arrivalTime: parseInt(arrivalTimes[index].value),
@@ -370,6 +370,7 @@
             <th colspan=2>Process ${processNumber}</th>
             <th colspan=2 class="cpu">CPU Switch</th>
             `;
+            totaltime += contextSwitch; // Add context switch time after each process
         }
     
         ganttChartHTML += `</tr><tr>`;
@@ -392,6 +393,7 @@
             <td>${endTime}</td>
             <td colspan=2>${contextSwitch}</td>
             `;
+            totaltime += contextSwitch;
         }
     
         ganttChartHTML += `</tr></table>`;
@@ -434,6 +436,7 @@
             <th colspan=2>Process ${processNumber}</th>
             <th colspan=2 class="cpu">CPU Switch</th>
         `;
+        totaltime += contextSwitch; // Add context switch time after each process
     }
 
     ganttChartHTML += `</tr><tr>`;
@@ -453,6 +456,7 @@
             <td>${endTime}</td>
             <td colspan=2>${contextSwitch}</td>
         `;
+        totaltime += contextSwitch; // Add context switch time after each process
     }
 
     ganttChartHTML += `</tr></table>`;
@@ -499,6 +503,7 @@
                   <th colspan=2>Process ${processNumber}</th>
                   <th colspan=2 class="cpu">CPU Switch</th>
               `;
+              totaltime += contextSwitch; // Add context switch time after each process
           }
       
           ganttChartHTML += `</tr><tr>`;
@@ -518,6 +523,7 @@
                   <td>${endTime}</td>
                   <td colspan=2>${contextSwitch}</td>
               `;
+              totaltime += contextSwitch; // Add context switch time after each process
           }
       
           ganttChartHTML += `</tr></table>`;
@@ -525,7 +531,8 @@
       }
       
       //*************** RR - GANTT******************
-      function GanttRR(executionorder, arrivalTimes, burstTimes, quantum) {
+      function GanttRR(executionorder, arrivalTimes, burstTimes, quantum) 
+      {
         let totaltime = 0;
         let contextSwitch=0;
           let c = parseInt(document.getElementById('context').value); // Retrieve context switch value
@@ -537,7 +544,8 @@
         let completedProcesses = [];
     
         // Initialize remaining burst times
-        for (let i = 0; i < burstTimes.length; i++) {
+        for (let i = 0; i < burstTimes.length; i++) 
+        {
             remainingBT.push(parseInt(burstTimes[i].value));
         }
     
@@ -551,16 +559,19 @@
         `;
     
         // Add headers for each process
-        for (let i = 0; i < executionorder.length; i++) {
+        for (let i = 0; i < executionorder.length; i++) 
+        {
             ganttChartHTML += `
                 <th colspan="2">Process ${executionorder[i].process}</th>
                 <th colspan="2" class="cpu">CPU Switch</th>
             `;
+            totaltime += contextSwitch; // Add context switch time after each process
         }
     
         ganttChartHTML += `</tr><tr>`;
     
-        while (completedProcesses.length < executionorder.length) {
+        while (completedProcesses.length < executionorder.length) 
+        {
             if (remainingBT[currentProcess] <= timeSlice && remainingBT[currentProcess] > 0) {
                 totaltime = currTime + remainingBT[currentProcess];
                 currTime = totaltime;
@@ -578,7 +589,7 @@
                 <td>${currTime}</td>
                 <td colspan="2">${contextSwitch}</td>
             `;
-    
+            totaltime += contextSwitch; // Add context switch time after each process
             let nextProcess = (currentProcess + 1) % executionorder.length;
             while (nextProcess !== currentProcess && remainingBT[nextProcess] === 0) {
                 nextProcess = (nextProcess + 1) % executionorder.length;
@@ -624,6 +635,7 @@
                   <th colspan=2>Process ${processNumber}</th>
                   <th colspan=2 class="cpu">CPU Switch</th>
               `;
+              totaltime += contextSwitch; // Add context switch time after each process
           }
       
           ganttChartHTML += `</tr><tr>`;
@@ -644,6 +656,7 @@
                   <td>${endTime}</td>
                   <td colspan=2>${contextSwitch}</td>
               `;
+              totaltime += contextSwitch; // Add context switch time after each process
           }
       
           ganttChartHTML += `</tr></table>`;
@@ -668,7 +681,7 @@
           // Generate and display Gantt chart
       
           const algorithm = document.getElementById('algorithm').value;
-          // Retrieve the values of arrivalTimes and burstTimes from the DOM
+          // Retrieve the values of arrivalTimes and burstTimes 
           const arrivalTimes = document.querySelectorAll('.arrival-time');
           const burstTimes = document.querySelectorAll('.burst-time');
           switch (algorithm) 
