@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Process Scheduling Simulator</title>
     <link rel="stylesheet" href="style.css">
-  
-    <!-- <link rel="stylesheet" href="style.css"> -->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/script.js"></script>
 </head>
 <!-- BODY -->
 <body>
@@ -45,6 +43,10 @@
 
             <label for="time-quantum">Time Quantum (for RR):</label>
             <input type="number" id="time-quantum" class="input-field" disabled>
+
+            <label for="context">Context Switch:</label>
+            <input type="number" id="context" class="input-field" enabled>
+
         </div>
 <!-- RUN ALGOOOSS -->
         <button class="btn" onclick="runAlgorithm()">Run Algorithm</button>
